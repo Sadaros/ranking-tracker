@@ -1,16 +1,25 @@
-## MTG Ranking Tracker - REST API Controllers Progress Summary
+## MTG Ranking Tracker - REST API Progress Summary
 
-### Building on Previous Work
-This continues from progressSummary1.md where we established the service layer, repositories, and data models.
+### Previous Status
+From progressSummary1.md: Backend architecture complete with entities, repositories, and service layer implemented. Elo calculation working. Ready to build REST API controllers.
 
-### REST API Controllers Created
+### Data Transfer Objects (DTOs)
+Created request DTOs in `net.sadaros.mtg.ranking_tracker.dto` package to handle incoming JSON data:
 
-Built three REST controllers following Spring Boot conventions:
+1. **CreatePlayerRequest** - contains player name
+2. **CreateDeckRequest** - contains deck name and all five MTG color booleans (white, blue, black, red, green)
+3. **RecordMatchRequest** - contains player1Id, player2Id, player1DeckId, player2DeckId, and match result as string
 
-#### 1. PlayerController (`/api/players`)
-**Endpoints:**
-- `GET /api/players` - Returns list of all players as JSON
-- `POST /api/players` - Creates a new player from JSON request body
+DTOs separate API structure from internal entity models, following REST best practices and enabling clean JSON deserialization.
+
+### REST Controllers
+Built three controllers following standard REST conventions:
+
+#### PlayerController (`/api/players`)
+- `GET /api/players` - list all players
+- `POST /api/players` - create new player (accepts CreatePlayerRequest JSON)
+- `GET /api/players/{id}` - get specific player by ID
+- `GET /api/players/search?name=X` - search for player by name
 
 **Implementation details:**
 - Uses `@RestController` annotation for automatic JSON serialization
@@ -18,61 +27,112 @@ Built three REST controllers following Spring Boot conventions:
 - Injects `PlayerService` via constructor dependency injection
 - Uses `@GetMapping` and `@PostMapping` for HTTP method routing
 
-#### 2. DeckController (`/api/decks`)
-**Endpoints:**
-- `GET /api/decks` - Returns list of all decks as JSON
-- `POST /api/decks` - Creates a new deck with MTG color identity
+#### DeckController (`/api/decks`)
+- `GET /api/decks` - list all decks
+- `POST /api/decks` - create new deck (accepts CreateDeckRequest JSON)
+- `GET /api/decks/{id}` - get specific deck by ID
+- `GET /api/decks/search?name=X` - search for deck by name
 
 **Implementation details:**
 - Follows same pattern as PlayerController
 - Handles deck creation with 5 color boolean flags (white, blue, black, red, green)
 
-#### 3. MatchController (`/api/matches`)
-**Endpoints:**
-- `GET /api/matches` - Returns list of all match records
-- `POST /api/matches` - Records a match result, updates player Elo ratings and stats
+#### MatchController (`/api/matches`)
+- `GET /api/matches` - list all matches
+- `POST /api/matches` - record new match (accepts RecordMatchRequest JSON)
+- `GET /api/matches/{id}` - get specific match by ID
 
 **Implementation details:**
 - Converts string result ("PLAYER1_WIN", "PLAYER2_WIN", "DRAW") to MatchResult enum
 - Coordinates player IDs, deck IDs, and match outcome
 - Returns the created Match object with before/after Elo ratings
 
-### DTOs (Data Transfer Objects) Created
-
-Created request DTOs in `net.sadaros.mtg.ranking_tracker.dto` package:
-
-1. **CreatePlayerRequest** - Contains player name
-2. **CreateDeckRequest** - Contains deck name and 5 color boolean flags
-3. **RecordMatchRequest** - Contains player1Id, player2Id, result string, player1DeckId, player2DeckId
-
-DTOs separate API contract from internal entity structure and enable clean JSON deserialization.
-
 ### Service Layer Updates
+Enhanced services to support new controller endpoints:
 
-**MatchService modifications:**
-- Changed `recordMatch()` return type from `void` to `Match`
-- Added `getAllMatches()` method to return all match history
+**MatchService:**
+- Changed `recordMatch()` return type from `void` to `Match` - returns the saved match
+- Added `getAllMatches()` method - retrieves all matches from repository
+- Added `getMatch(Long id)` method - retrieves specific match by ID
 - Now returns the saved Match entity so REST API can respond with match details
 
-### Key Concepts Learned
+**PlayerService:**
+- Added `getPlayerByName(String name)` method - finds player by name with error handling
 
-1. **REST API basics** - HTTP methods (GET, POST), URL routing, request/response cycle
-2. **Spring annotations** - `@RestController`, `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@RequestBody`
-3. **Dependency injection** - Constructor injection of services into controllers
-4. **Automatic JSON serialization** - Spring converts Java objects to/from JSON automatically
-5. **DTO pattern** - Separating API data structures from database entities
-6. **HTTP status codes** - Implicit 200 OK on successful requests
+**DeckService:**
+- Added `getDeckByName(String name)` method - finds deck by name with error handling
 
+### Repository Layer Updates
+Extended repositories with custom query methods:
+
+**PlayerRepository:**
+- Added `Optional<Player> findByName(String name)` - Spring Data JPA auto-generates query
+
+**DeckRepository:**
+- Added `Optional<Deck> findByName(String name)` - Spring Data JPA auto-generates query
+
+### Key Technical Patterns Learned
+
+**REST API Basics:**
+- HTTP methods (GET, POST) for different operations
+- URL routing and resource-based endpoint design
+- Request/response cycle
+
+**Dependency Injection:**
+- Controllers receive services via constructor injection
+- Spring automatically manages bean lifecycle
+
+**REST Annotations:**
+- `@RestController` - marks class as REST API controller, auto-converts responses to JSON
+- `@RequestMapping("/path")` - class-level URL prefix
+- `@GetMapping` / `@PostMapping` - method-level HTTP verb mapping
+- `@RequestBody` - deserializes JSON request body to Java object
+- `@PathVariable` - extracts values from URL path (e.g., `/players/{id}`)
+- `@RequestParam` - extracts query parameters (e.g., `?name=Alice`)
+
+**Error Handling:**
+- Service methods throw `IllegalArgumentException` when resources not found
+- Uses `Optional.orElseThrow()` pattern for clean error handling
+
+**REST Conventions:**
+- Resource URLs use plural nouns (`/players`, `/decks`, `/matches`)
+- ID access via path: `/resource/{id}`
+- Search/filter via query params: `/resource/search?field=value`
+- POST requests accept JSON in request body, return created resource
+- HTTP status codes - Implicit 200 OK on successful requests
+
+**JSON Serialization:**
+- Spring converts Java objects to/from JSON automatically
+- No manual parsing required
+
+**DTO Pattern:**
+- Separating API data structures from database entities
+- Clean separation between API contract and internal entity structure
 
 ### Architecture Complete
 
 The backend now has all three layers fully implemented:
 - **Controllers** - Handle HTTP requests/responses
-- **Services** - Contain business logic (Elo calculation, match recording)
-- **Repositories** - Provide database access
+- **Services** - Contain business logic (Elo calculation, match recording, player/deck management)
+- **Repositories** - Provide database access via Spring Data JPA
 
 All endpoints from the original roadmap are now functional.
 
+### Testing
+All endpoints manually tested using Chrome DevTools:
+- Created players and decks successfully
+- Recorded matches with Elo calculation working correctly
+- Retrieved resources by ID and name
+- Verified JSON serialization working automatically
+
+### Status
+**Backend REST API: Complete** ✓
+
+All core CRUD operations implemented and tested. The API is fully functional and ready for frontend integration.
+
 ---
 
-**Next steps:** Frontend development (HTML/CSS/JavaScript) to create a user interface that consumes these REST API endpoints.
+**Next Steps:**
+- Build HTML/CSS/JavaScript frontend to consume the REST API
+- Create UI for viewing rankings, recording matches, and managing players/decks
+- Consider adding API testing tool (Postman) or test data seeding script for easier development
