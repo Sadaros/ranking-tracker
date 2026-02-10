@@ -1,0 +1,36 @@
+package net.sadaros.mtg.ranking_tracker.controller;
+
+
+import net.sadaros.mtg.ranking_tracker.dto.CreateDeckRequest;
+import net.sadaros.mtg.ranking_tracker.model.Deck;
+import net.sadaros.mtg.ranking_tracker.service.DeckService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/decks")
+public class DeckController {
+    private final DeckService deckService;
+
+    public DeckController(DeckService deckService) {
+        this.deckService = deckService;
+    }
+
+    @GetMapping
+    public List<Deck> getAllDecks() {
+        return deckService.getAllDecks();
+    }
+
+    @PostMapping
+    public Deck createDeck(@RequestBody CreateDeckRequest request) {
+        return deckService.createDeck(
+                request.getName(),
+                request.isWhite(),
+                request.isBlue(),
+                request.isBlack(),
+                request.isRed(),
+                request.isGreen()
+        );
+    }
+}
