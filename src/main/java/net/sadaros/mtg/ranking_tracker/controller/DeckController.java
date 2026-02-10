@@ -22,6 +22,16 @@ public class DeckController {
         return deckService.getAllDecks();
     }
 
+    @GetMapping("/{id}")
+    public Deck getDeckById(@PathVariable Long id) {
+        return deckService.getDeck(id);
+    }
+
+    @GetMapping("/search")
+    public Deck getDeckByName(@RequestParam String name) {
+        return deckService.getDeckByName(name);
+    }
+
     @PostMapping
     public Deck createDeck(@RequestBody CreateDeckRequest request) {
         return deckService.createDeck(

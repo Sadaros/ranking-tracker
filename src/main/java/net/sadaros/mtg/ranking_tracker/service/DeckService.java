@@ -26,6 +26,11 @@ public class DeckService {
                 .orElseThrow(() -> new IllegalArgumentException("Deck not found"));
     }
 
+    public Deck getDeckByName(String name) {
+        return deckRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("No deck named " + name + " found"));
+    }
+
     public List<Deck> getAllDecks() {
         return deckRepository.findAll();
     }

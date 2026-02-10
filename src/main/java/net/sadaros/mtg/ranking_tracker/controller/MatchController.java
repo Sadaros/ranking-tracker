@@ -22,6 +22,11 @@ public class MatchController {
         return matchService.getAllMatches();
     }
 
+    @GetMapping("/{id}")
+    public Match getMatchById(@PathVariable Long id) {
+        return matchService.getMatch(id);
+    }
+
     @PostMapping
     public Match recordMatch(@RequestBody RecordMatchRequest request) {
         MatchResult result = MatchResult.valueOf(request.getResult().toUpperCase());

@@ -23,6 +23,16 @@ public class PlayerController {
         return playerService.getAllPlayers();
     }
 
+    @GetMapping("/{id}")
+    public Player getPlayerById(@PathVariable Long id) {
+        return playerService.getPlayer(id);
+    }
+
+    @GetMapping("/search")
+    public Player getPlayerByName(@RequestParam String name) {
+        return playerService.getPlayerByName(name);
+    }
+
     @PostMapping
     public Player createPlayer(@RequestBody CreatePlayerRequest request) {
         return playerService.createPlayer(request.getName());

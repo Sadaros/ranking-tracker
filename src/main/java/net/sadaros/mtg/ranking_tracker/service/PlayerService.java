@@ -26,6 +26,11 @@ public class PlayerService {
                 .orElseThrow(() -> new IllegalArgumentException("Player not found"));
     }
 
+    public Player getPlayerByName(String name) {
+        return playerRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("No player named " + name + " found"));
+    }
+
     public void updatePlayer(Player player) {
         playerRepository.save(player);
     }
