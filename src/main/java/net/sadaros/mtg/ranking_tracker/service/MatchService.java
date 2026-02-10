@@ -7,6 +7,8 @@ import net.sadaros.mtg.ranking_tracker.model.Player;
 import net.sadaros.mtg.ranking_tracker.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MatchService {
 
@@ -27,7 +29,7 @@ public class MatchService {
         this.deckService = deckService;
     }
 
-    public void recordMatch(
+    public Match recordMatch(
             long player1Id, long player2Id, MatchResult result,
             long player1DeckId, long player2DeckId
     ) {
@@ -67,8 +69,17 @@ public class MatchService {
                 player1NewElo, player2NewElo
         );
 
-        matchRepository.save(match);
         playerService.updatePlayer(player1);
         playerService.updatePlayer(player2);
+        return matchRepository.save(match);
+    }
+
+    public Match getMatch(Long id) {
+        return matchRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+    }
+
+    public List<Match> getAllMatches() {
+        return matchRepository.findAll();
     }
 }
