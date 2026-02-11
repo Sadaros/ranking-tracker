@@ -29,7 +29,7 @@ public class MatchController {
 
     @PostMapping
     public Match recordMatch(@RequestBody RecordMatchRequest request) {
-        MatchResult result = MatchResult.valueOf(request.getResult().toUpperCase());
+        MatchResult result = request.getResult();
         return matchService.recordMatch(
                 request.getPlayer1Id(), request.getPlayer2Id(), result,
                 request.getPlayer1DeckId(), request.getPlayer2DeckId()

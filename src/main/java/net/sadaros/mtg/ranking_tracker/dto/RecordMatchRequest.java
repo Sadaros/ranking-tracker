@@ -1,9 +1,11 @@
 package net.sadaros.mtg.ranking_tracker.dto;
 
+import net.sadaros.mtg.ranking_tracker.model.MatchResult;
+
 public class RecordMatchRequest {
     private long player1Id;
     private long player2Id;
-    private String result;
+    private MatchResult result;
     private long player1DeckId;
     private long player2DeckId;
 
@@ -23,11 +25,11 @@ public class RecordMatchRequest {
         this.player2Id = player2Id;
     }
 
-    public String getResult() {
+    public MatchResult getResult() {
         return result;
     }
 
-    public void setResult(String result) {
+    public void setResult(MatchResult result) {
         this.result = result;
     }
 

@@ -24,4 +24,3 @@ public class EloService {
         return new ExpectedScore(playerExpectedScore, 1 - playerExpectedScore);
     }
 }
-
