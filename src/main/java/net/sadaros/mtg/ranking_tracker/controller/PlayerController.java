@@ -1,5 +1,6 @@
 package net.sadaros.mtg.ranking_tracker.controller;
 
+import jakarta.validation.Valid;
 import net.sadaros.mtg.ranking_tracker.dto.CreatePlayerRequest;
 import net.sadaros.mtg.ranking_tracker.model.Player;
 import net.sadaros.mtg.ranking_tracker.service.PlayerService;
@@ -34,7 +35,7 @@ public class PlayerController {
     }
 
     @PostMapping
-    public Player createPlayer(@RequestBody CreatePlayerRequest request) {
+    public Player createPlayer(@RequestBody @Valid CreatePlayerRequest request) {
         return playerService.createPlayer(request.getName());
     }
 }

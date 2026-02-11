@@ -1,6 +1,10 @@
 package net.sadaros.mtg.ranking_tracker.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class CreateDeckRequest {
+
+    @NotBlank(message = "Deck name is required, and cannot be blank")
     private String name;
     private boolean white;
     private boolean blue;

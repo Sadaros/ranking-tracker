@@ -1,6 +1,7 @@
 package net.sadaros.mtg.ranking_tracker.controller;
 
 
+import jakarta.validation.Valid;
 import net.sadaros.mtg.ranking_tracker.dto.CreateDeckRequest;
 import net.sadaros.mtg.ranking_tracker.model.Deck;
 import net.sadaros.mtg.ranking_tracker.service.DeckService;
@@ -33,7 +34,7 @@ public class DeckController {
     }
 
     @PostMapping
-    public Deck createDeck(@RequestBody CreateDeckRequest request) {
+    public Deck createDeck(@RequestBody @Valid CreateDeckRequest request) {
         return deckService.createDeck(
                 request.getName(),
                 request.isWhite(),
