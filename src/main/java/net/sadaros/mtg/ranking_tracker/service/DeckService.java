@@ -1,5 +1,6 @@
 package net.sadaros.mtg.ranking_tracker.service;
 
+import net.sadaros.mtg.ranking_tracker.exception.ResourceNotFoundException;
 import net.sadaros.mtg.ranking_tracker.model.Deck;
 import net.sadaros.mtg.ranking_tracker.repository.DeckRepository;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,12 @@ public class DeckService {
 
     public Deck getDeck(Long id) {
         return deckRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Deck not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Deck not found"));
     }
 
     public Deck getDeckByName(String name) {
         return deckRepository.findByName(name)
-                .orElseThrow(() -> new IllegalArgumentException("No deck named " + name + " found"));
+                .orElseThrow(() -> new ResourceNotFoundException("No deck named " + name + " found"));
     }
 
     public List<Deck> getAllDecks() {

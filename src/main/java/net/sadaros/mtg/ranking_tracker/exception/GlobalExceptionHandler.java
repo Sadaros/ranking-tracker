@@ -1,5 +1,6 @@
 package net.sadaros.mtg.ranking_tracker.exception;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import net.sadaros.mtg.ranking_tracker.dto.ErrorResponse;
 import org.springframework.http.HttpStatusCode;
@@ -54,7 +55,7 @@ public class GlobalExceptionHandler {
             logger.error("Unknown error: {}", ex.getCause().toString());
         }
 
-        ErrorResponse errorResponse = createErrorResponse(request, error, invalidFields);
+        ErrorResponse errorResponse = createErrorResponse(request, error, invalidFields, 400);
 
         return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(400));
     }
@@ -71,21 +72,27 @@ public class GlobalExceptionHandler {
             invalidFields.put(error.getField(), error.getDefaultMessage());
         }
 
-        ErrorResponse errorResponse = createErrorResponse(request, "Bad Request", invalidFields);
+        ErrorResponse errorResponse = createErrorResponse(request, "Bad Request", invalidFields, 400);
 
         return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(400));
     }
-    private static ErrorResponse createErrorResponse(HttpServletRequest request, String error, Map<String, String> invalidFields) {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundExceptions(
+            ResourceNotFoundException ex,
+            HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(request, ex.getMessage(), null, 404);
+        return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(404));
+    }
+
+
+    private static ErrorResponse createErrorResponse(HttpServletRequest request, String error, @Nullable Map<String, String> invalidFields, int statusCode) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimeStamp(LocalDateTime.now());
-        errorResponse.setStatusCode(400);
+        errorResponse.setStatusCode(statusCode);
         errorResponse.setPath(request.getRequestURI());
         errorResponse.setError(error);
-        if(invalidFields.isEmpty()) {
-            errorResponse.setInvalidFields(null);
-        } else {
-            errorResponse.setInvalidFields(invalidFields);
-        }
+        errorResponse.setInvalidFields(invalidFields);
         return errorResponse;
     }
 }

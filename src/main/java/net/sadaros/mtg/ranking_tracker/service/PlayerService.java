@@ -1,6 +1,7 @@
 package net.sadaros.mtg.ranking_tracker.service;
 
 
+import net.sadaros.mtg.ranking_tracker.exception.ResourceNotFoundException;
 import net.sadaros.mtg.ranking_tracker.model.Player;
 import net.sadaros.mtg.ranking_tracker.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,12 @@ public class PlayerService {
 
     public Player getPlayer(Long id) {
         return playerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Player not found"));
     }
 
     public Player getPlayerByName(String name) {
         return playerRepository.findByName(name)
-                .orElseThrow(() -> new IllegalArgumentException("No player named " + name + " found"));
+                .orElseThrow(() -> new ResourceNotFoundException("No player named " + name + " found"));
     }
 
     public void updatePlayer(Player player) {

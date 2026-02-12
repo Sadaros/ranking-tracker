@@ -1,5 +1,6 @@
 package net.sadaros.mtg.ranking_tracker.service;
 
+import net.sadaros.mtg.ranking_tracker.exception.ResourceNotFoundException;
 import net.sadaros.mtg.ranking_tracker.model.Deck;
 import net.sadaros.mtg.ranking_tracker.model.Match;
 import net.sadaros.mtg.ranking_tracker.model.MatchResult;
@@ -17,7 +18,7 @@ public class MatchService {
     private final EloService eloService;
     private final DeckService deckService;
 
-    public  MatchService(
+    public MatchService(
             MatchRepository matchRepository,
             PlayerService playerService,
             EloService eloService,
@@ -76,7 +77,7 @@ public class MatchService {
 
     public Match getMatch(Long id) {
         return matchRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Match not found"));
     }
 
     public List<Match> getAllMatches() {
