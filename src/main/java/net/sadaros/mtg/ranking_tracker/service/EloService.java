@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EloService {
 
-    private static final int K_FACTOR =32;
+    private static final int K_FACTOR = 32;
 
     public UpdatedEloScoreRecord updatedEloScore(int player1Elo, int player2Elo, MatchResult result) {
         ExpectedScore expected = calculateExpectedScore(player1Elo, player2Elo);

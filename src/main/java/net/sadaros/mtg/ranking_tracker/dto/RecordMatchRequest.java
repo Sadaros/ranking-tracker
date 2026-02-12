@@ -1,13 +1,19 @@
 package net.sadaros.mtg.ranking_tracker.dto;
 
+import jakarta.validation.constraints.Positive;
 import net.sadaros.mtg.ranking_tracker.model.MatchResult;
 
 public class RecordMatchRequest {
+
+    @Positive
     private long player1Id;
+    @Positive
     private long player2Id;
-    private MatchResult result;
+    @Positive
     private long player1DeckId;
+    @Positive
     private long player2DeckId;
+    private MatchResult result;
 
     public long getPlayer1Id() {
         return player1Id;

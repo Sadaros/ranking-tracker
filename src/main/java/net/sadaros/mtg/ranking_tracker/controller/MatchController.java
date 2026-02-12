@@ -1,5 +1,6 @@
 package net.sadaros.mtg.ranking_tracker.controller;
 
+import jakarta.validation.Valid;
 import net.sadaros.mtg.ranking_tracker.dto.RecordMatchRequest;
 import net.sadaros.mtg.ranking_tracker.model.Match;
 import net.sadaros.mtg.ranking_tracker.model.MatchResult;
@@ -28,7 +29,7 @@ public class MatchController {
     }
 
     @PostMapping
-    public Match recordMatch(@RequestBody RecordMatchRequest request) {
+    public Match recordMatch(@RequestBody @Valid RecordMatchRequest request) {
         MatchResult result = request.getResult();
         return matchService.recordMatch(
                 request.getPlayer1Id(), request.getPlayer2Id(), result,
