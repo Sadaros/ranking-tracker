@@ -7,6 +7,7 @@ public class ErrorResponse {
     private LocalDateTime timeStamp;
     private int statusCode;
     private String error;
+    private String message;
     private String path;
     private Map<String, String> invalidFields;
 
@@ -16,9 +17,18 @@ public class ErrorResponse {
                 "timeStamp=" + timeStamp +
                 ", statusCode=" + statusCode +
                 ", error='" + error + '\'' +
+                ", message='" + message + '\'' +
                 ", path='" + path + '\'' +
                 ", invalidFields=" + invalidFields +
                 '}';
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public LocalDateTime getTimeStamp() {

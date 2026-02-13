@@ -31,12 +31,12 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         Throwable cause = ex.getCause();
-        String error;
+        String message;
         String invalidField = "";
-        Map<String, String> invalidFields = new HashMap<>();
+        Map<String, String> invalidFields = null;
 
         if (cause instanceof InvalidFormatException) {
-            error = "Bad Request";
+            message = "One or more fields are invalid";
             invalidField += ("Invalid value '");
             invalidField += (((InvalidFormatException) cause).getValue());
             invalidField += ("' for field of type ");
@@ -46,16 +46,17 @@ public class GlobalExceptionHandler {
                 invalidField += (". Accepted values are: ");
                 invalidField += (Arrays.toString(targetType.getEnumConstants()));
             }
+            invalidFields = new HashMap<>();
             invalidFields.put(((InvalidFormatException) cause).getPath().getLast().getPropertyName(), invalidField);
 
         } else if (cause instanceof StreamReadException) {
-            error = (ex.getMessage());
+            message = (ex.getMessage());
         } else {
-            error = ("Unknown Error");
-            logger.error("Unknown error: {}", ex.getCause().toString());
+            message = ("Unknown Error");
+            logger.warn("Unknown error: {}", ex.getCause().toString());
         }
 
-        ErrorResponse errorResponse = createErrorResponse(request, error, invalidFields, 400);
+        ErrorResponse errorResponse = createErrorResponse(request, "Bad request", invalidFields, 400, message);
 
         return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(400));
     }
@@ -72,7 +73,7 @@ public class GlobalExceptionHandler {
             invalidFields.put(error.getField(), error.getDefaultMessage());
         }
 
-        ErrorResponse errorResponse = createErrorResponse(request, "Bad Request", invalidFields, 400);
+        ErrorResponse errorResponse = createErrorResponse(request, "Bad request", invalidFields, 400, "One or more fields invalid");
 
         return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(400));
     }
@@ -81,17 +82,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleResourceNotFoundExceptions(
             ResourceNotFoundException ex,
             HttpServletRequest request) {
-        ErrorResponse errorResponse = createErrorResponse(request, ex.getMessage(), null, 404);
+        Map<String, String> invalidFields = null;
+        if (ex.getField() != null) {
+            invalidFields = new HashMap<>();
+            invalidFields.put(ex.getField(), ex.getMessage());
+        }
+        ErrorResponse errorResponse = createErrorResponse(request, "Not found", invalidFields, 404, "One or more resources not found");
         return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(404));
     }
 
+    @ExceptionHandler(DuplicateNameException.class)
+    public ResponseEntity<?> handleDuplicateNames(
+            DuplicateNameException ex,
+            HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(request, "Conflict", null, 409, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(409));
+    }
 
-    private static ErrorResponse createErrorResponse(HttpServletRequest request, String error, @Nullable Map<String, String> invalidFields, int statusCode) {
+
+    private static ErrorResponse createErrorResponse(HttpServletRequest request, String error, @Nullable Map<String, String> invalidFields, int statusCode, String message) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimeStamp(LocalDateTime.now());
         errorResponse.setStatusCode(statusCode);
         errorResponse.setPath(request.getRequestURI());
         errorResponse.setError(error);
+        errorResponse.setMessage(message);
         errorResponse.setInvalidFields(invalidFields);
         return errorResponse;
     }

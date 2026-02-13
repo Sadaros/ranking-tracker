@@ -34,10 +34,30 @@ public class MatchService {
             long player1Id, long player2Id, MatchResult result,
             long player1DeckId, long player2DeckId
     ) {
-        Player player1 = playerService.getPlayer(player1Id);
-        Player player2 = playerService.getPlayer(player2Id);
-        Deck player1Deck = deckService.getDeck(player1DeckId);
-        Deck player2Deck = deckService.getDeck(player2DeckId);
+        Player player1;
+        Player player2;
+        Deck player1Deck;
+        Deck player2Deck;
+        try {
+            player1 = playerService.getPlayer(player1Id);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage(), "player1Id");
+        }
+        try {
+            player2 = playerService.getPlayer(player2Id);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage(), "player2Id");
+        }
+        try {
+            player1Deck = deckService.getDeck(player1DeckId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage(), "player1DeckId");
+        }
+        try {
+            player2Deck = deckService.getDeck(player2DeckId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage(), "player2DeckId");
+        }
         int player1Elo = player1.getEloRating();
         int player2Elo = player2.getEloRating();
         UpdatedEloScoreRecord newEloScores = eloService.updatedEloScore(player1Elo, player2Elo, result);
